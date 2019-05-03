@@ -1,0 +1,29 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: count-integration-tests
+spec:
+  schedule: "30 16 * * 1,3,5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: buildnode-runner
+            image: index.docker.io/ssimwavedocker/buildnode:28-Mar-2019
+            command: ['/bin/bash', '/tools/test/count_integration_tests.sh']
+            volumeMounts:
+            - name: count-integration-tests
+              mountPath: //tools/test/
+            - name: secret
+              mountPath: //tools/test/metrics/
+          volumes:
+          - name: count-integration-tests
+            configMap:
+              defaultMode: 0755
+              name: count-integration-tests
+          - name: secret
+            secret:
+              secretName: keys
+              defaultMode: 0600
