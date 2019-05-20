@@ -9,17 +9,11 @@ data:
     # This script outputs the number of integration tests currently written to date:
     # This script is to be run Monday, Wednesday, and Friday each week at 4:30pm using a cron job
     ssh -o StrictHostKeyChecking=no git@bitbucket.org
-    ssh-agent bash -c 'ssh-add /tools/test/metrics/privatekey; git clone git@bitbucket.org:ssimwave/big.git'
-
-    #GIT_SSH_COMMAND='ssh -i /tools/test/metrics/privatekey' git clone git@bitbucket.org:ssimwave/big.git
+    ssh-agent bash -c 'ssh-add #ssh_key_path; git clone git@bitbucket.org:ssimwave/big.git'
 
     cd big
 
-    #git checkout develop
-
-    # Variable for pathway to dazel query:
-    
-    bazel_path=bazel
+    git checkout develop
 
     current_day=$(date +"%m-%d-%y")
 
@@ -27,14 +21,14 @@ data:
     # wc -l outputs just the number of tests instead of having each file listed including the pathway to that file
     # also have variables for the number of integration tests with a manual tag
 
-    livemonitor_count=$($bazel_path query 'filter("integration_test_*", tests(//livemonitor/...))' | wc -l)
-    livemonitor_manual_count=$($bazel_path query 'attr("tags", "manual", filter("integration_test_*", tests(//livemonitor/...)))' | wc -l)
+    livemonitor_count=$(bazel query 'filter("integration_test_*", tests(//livemonitor/...))' | wc -l)
+    livemonitor_manual_count=$(bazel query 'attr("tags", "manual", filter("integration_test_*", tests(//livemonitor/...)))' | wc -l)
 
-    vodmonitor_count=$($bazel_path query 'filter("integration_test_*", tests(//vodmonitor/...))' | wc -l)
-    vodmonitor_manual_count=$($bazel_path query 'attr("tags", "manual", filter("integration_test_*", tests(//vodmonitor/...)))' | wc -l)
+    vodmonitor_count=$(bazel query 'filter("integration_test_*", tests(//vodmonitor/...))' | wc -l)
+    vodmonitor_manual_count=$(bazel query 'attr("tags", "manual", filter("integration_test_*", tests(//vodmonitor/...)))' | wc -l)
 
-    deployment_count=$($bazel_path query 'filter("integration_test_*", tests(//deploy/...))' | wc -l)
-    deployment_manual_count=$($bazel_path query 'attr("tags", "manual", filter("integration_test_*", tests(//deploy/...)))' | wc -l)
+    deployment_count=$(bazel query 'filter("integration_test_*", tests(//deploy/...))' | wc -l)
+    deployment_manual_count=$(bazel query 'attr("tags", "manual", filter("integration_test_*", tests(//deploy/...)))' | wc -l)
 
     # function to output the data to the slack channel: integration_tests
 
