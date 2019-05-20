@@ -17,7 +17,7 @@ spec:
             - name: count-integration-tests
               mountPath: //tools/test/
             - name: secret
-              mountPath: //tools/test/metrics/
+              mountPath: //secret-path
           volumes:
           - name: count-integration-tests
             configMap:
